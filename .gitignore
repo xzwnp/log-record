@@ -1,0 +1,6 @@
+# Project exclude paths
+/operation-log-core/target/
+/operation-log-spring-boot-starter/target/
+# Project exclude paths
+/log-record-core/target/
+/log-record-spring-boot-starter/target/
