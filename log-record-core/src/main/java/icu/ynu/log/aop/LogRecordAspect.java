@@ -17,12 +17,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelParseException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
@@ -39,12 +42,11 @@ import java.util.concurrent.*;
  * 2023/1/10
  * 11:34
  */
-@Slf4j
 @Component
 @Aspect
 @EnableAspectJAutoProxy
 public class LogRecordAspect {
-
+    private static final Logger log = LoggerFactory.getLogger("LogInnerError");
     private final ExecutorService logExecutor;
 
 
@@ -160,10 +162,9 @@ public class LogRecordAspect {
             Operator operator = getOperator(logRecord);
             long cost = stopWatch.getTotalTimeMillis(); //业务执行耗时
             //操作内容用SpEL解析器解析后输出
-            String content = expressionParser.parseExpression(logRecord.content()).getValue(evaluationContext, String.class);
-            String bizId = expressionParser.
-                    parseExpression(logRecord.bizId()).getValue(evaluationContext, String.class);
-            String bizType = logRecordDto.getBizType();
+            String content = parseExpression(logRecord.content(), evaluationContext);
+            String bizId = parseExpression(logRecord.bizId(), evaluationContext);
+            String bizType = logRecord.bizType();
             //输出操作内容到控制台
             log.info("bizId:{},类型:{},描述:{},耗时:{}ms", bizId, bizType, content, cost);
 
@@ -198,10 +199,21 @@ public class LogRecordAspect {
         } catch (JsonProcessingException e) {
             log.error("Json解析异常,无法输出到控制台", e);
         } catch (Exception e) {
-            throw new LogRecordException(e.getMessage(), e);
+            log.error("日志系统出现内部错误.原因:" + e.getMessage(), e);
         } finally {
             //threadLocal手动清除,避免内存泄露
             LogRecordContext.clear();
+        }
+    }
+
+    private String parseExpression(String expressionString, EvaluationContext evaluationContext) {
+        try {
+            return expressionParser.
+                    parseExpression(expressionString).getValue(evaluationContext, String.class);
+        } catch (SpelParseException | SpelEvaluationException e) {
+            String message = new StringBuilder().append("SpEL表达式{").append(expressionString).append("}无法解析,")
+                    .append("原因:").append(e.getMessage()).toString();
+            throw new LogRecordException(message, e);
         }
     }
 

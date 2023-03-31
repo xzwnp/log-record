@@ -121,15 +121,17 @@ public class LogRecordDto {
     @Override
     public String toString() {
         String errMessage = exception == null ? null : exception.getMessage();
-        return "{\t" +
-                "业务id:'" + bizId + '\'' +
-                ", 业务类型:'" + bizType + '\'' +
-                ", 操作描述:'" + content + '\'' +
-                ", 操作员编号:'" + operatorId + '\'' +
-                ", 操作员姓名:'" + operatorName + '\'' +
-                ", 操作结果状态=" + (success ? "成功" : "失败") +
-                ", 耗时=" + timeCost +
-                "ms\t}";
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\t")
+                .append("业务id:'").append(bizId)
+                .append(", 业务类型:'").append(bizType)
+                .append(", 操作描述:'").append(content)
+                .append(", 操作员编号:'").append(operatorId)
+                .append(", 操作员姓名:'").append(operatorName)
+                .append(", 操作结果状态=").append(success ? "成功" : "失败,错误信息:" + errMessage)
+                .append(", 耗时=").append(timeCost)
+                .append("ms\t}");
+        return sb.toString();
     }
 
     public String toJsonString() {

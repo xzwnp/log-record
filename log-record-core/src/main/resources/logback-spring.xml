@@ -29,11 +29,11 @@
         <!--        <File>logs/operation.%-info.%i.log</File>-->
         <append>true</append>
         <!--   接收什么级别的日志     -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
+<!--        <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+<!--            <level>INFO</level>-->
+<!--            <onMatch>ACCEPT</onMatch>-->
+<!--            <onMismatch>DENY</onMismatch>-->
+<!--        </filter>-->
         <!--   日志格式     -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--   文件名格式      -->
@@ -193,7 +193,7 @@
     <!--  logger:配置某个包/某个类的日志输出方式,和root相比相当于是定制化了.
            注意需要配置additivity="false",表示不向上级logger传递消息,如果配置为true,可能会导致重复输出
       -->
-    <logger name="icu.ynu.log.aop.LogRecordAspect" additivity="false" level="INFO">
+    <logger name="LogInnerError" additivity="false" level="INFO">
         <appender-ref ref="FILE_LOG_INNER_ERROR"/>
         <appender-ref ref="CONSOLE"/>
     </logger>

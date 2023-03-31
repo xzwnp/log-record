@@ -12,7 +12,7 @@ import java.util.Map;
  * bug: 日志线程只有第一次能输出订单号,后面输出的订单号和第一次一样???
  * 原因:InheritableThreadLocal只是在线程Create的时候复制一份父线程数据,使用线程池的话不会再创建线程了,
  * 也就导致不会重新复制一遍父线程的数据
- * 解决方案:使用阿里的TransmittableThreadLocal todo
+ * 解决方案:使用阿里的TransmittableThreadLocal
  */
 public class LogRecordContext {
     /**

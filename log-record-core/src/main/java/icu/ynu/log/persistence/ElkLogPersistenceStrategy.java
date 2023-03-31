@@ -25,9 +25,8 @@ public class ElkLogPersistenceStrategy implements LogPersistenceStrategy {
     public void doPersistence(LogRecordDto logRecordDto) {
         //根据是否抛异常来确定日志级别
         if (logRecordDto.getException() != null) {
-            log.error(logRecordDto.toJsonString());
-        } else {
-            log.info(logRecordDto.toJsonString());
+            log.error(logRecordDto.toJsonString(), logRecordDto.getException());
         }
+        log.info(logRecordDto.toJsonString());
     }
 }

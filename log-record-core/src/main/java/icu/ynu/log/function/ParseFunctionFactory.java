@@ -2,6 +2,7 @@ package icu.ynu.log.function;
 
 import icu.ynu.log.annotation.LogRecordFunction;
 import icu.ynu.log.annotation.LogRecordFunctionBean;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -17,6 +18,7 @@ import java.util.*;
 /**
  * 基于Spring的依赖注入,从容器中获取全部IParseFunction装入工厂,需要用的时候直接根据函数名获取即可
  */
+@Slf4j
 public class ParseFunctionFactory implements ApplicationContextAware {
     private final Map<String, Method> functionMap = new HashMap<>();
     private ApplicationContext applicationContext;
@@ -46,10 +48,15 @@ public class ParseFunctionFactory implements ApplicationContextAware {
             //拿到所有方法
             for (Method method : methods) {
                 //静态方法+注解标注,说明是的
-                if (Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(LogRecordFunction.class)) {
-                    String functionName = Optional.of(method.getAnnotation(LogRecordFunction.class).value()).orElseGet(method::getName);
-                    functionMap.put(functionName, method);
+                if (!method.isAnnotationPresent(LogRecordFunction.class)) {
+                    continue;
                 }
+                if (!Modifier.isStatic(method.getModifiers())) {
+                    log.warn("LogRecordFunction{}#{}必须是一个静态方法!", method.getDeclaringClass().getName(), method.getName());
+                    continue;
+                }
+                String functionName = Optional.of(method.getAnnotation(LogRecordFunction.class).value()).orElseGet(method::getName);
+                functionMap.put(functionName, method);
             }
         }
     }

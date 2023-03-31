@@ -28,9 +28,8 @@ public class FileLogPersistenceStrategy implements LogPersistenceStrategy {
         //根据是否抛异常来确定日志级别
         if (logRecordDto.getException() != null) {
             MDC.put("errorMsg", logRecordDto.getException().getMessage());
-            log.error(logRecordDto.toString());
-        } else {
-            log.info(logRecordDto.toString());
+            log.error(logRecordDto.toString(), logRecordDto.getException());
         }
+        log.info(logRecordDto.toString());
     }
 }

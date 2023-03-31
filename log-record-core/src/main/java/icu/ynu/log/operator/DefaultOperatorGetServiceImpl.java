@@ -10,6 +10,6 @@ public class DefaultOperatorGetServiceImpl implements IOperatorGetService {
 	 */
 	@Override
 	public Operator getOperator() {
-		return null;
+		return new Operator();
 	}
 }
