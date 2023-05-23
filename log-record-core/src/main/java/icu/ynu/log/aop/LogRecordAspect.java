@@ -163,7 +163,9 @@ public class LogRecordAspect {
 			//初始化logRecordDto的必要属性
 			Operator operator = getOperator(logRecord);
 			//之前并没有提前解析SpEL,现在解析
-			doParseExpression(dto, logRecord, signature.getMethod(), joinPoint.getArgs());
+			if (!logRecord.executeBefore()) {
+				doParseExpression(dto, logRecord, signature.getMethod(), joinPoint.getArgs());
+			}
 			String bizType = logRecord.bizType();
 			//输出操作内容到控制台
 			log.info("bizId:{},类型:{},描述:{},耗时:{}ms", dto.getBizId(), bizType, dto.getContent(), cost);
