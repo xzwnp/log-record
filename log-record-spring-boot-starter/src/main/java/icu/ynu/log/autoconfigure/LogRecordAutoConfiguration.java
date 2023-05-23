@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @Slf4j
-@ComponentScan(basePackages = "icu.ynu.log") //不加这个扫描不到包下的Component
+@ComponentScan(basePackages = "icu.ynu.log")
 @EnableConfigurationProperties(LogRecordProperties.class)
 public class LogRecordAutoConfiguration {
     @Autowired

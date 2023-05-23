@@ -5,3 +5,4 @@
 /log-record-core/target/
 /log-record-spring-boot-starter/target/
 /log-record-test/
+.idea

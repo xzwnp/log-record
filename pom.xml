@@ -16,6 +16,7 @@
     <modules>
         <module>log-record-core</module>
         <module>log-record-spring-boot-starter</module>
+        <module>test</module>
     </modules>
     <description>基于注解和SpEL的操作日志记录框架</description>
     <properties>
