@@ -1,39 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!--  引入Springboot自带的Log配置,从而使他们同时生效  -->
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <!--  引入Springboot自带的控制台Log配置,从而使他们同时生效  -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!--  分组名称  -->
+    <springProperty name="GROUP_NAME" scope="context" source="log-record.group-name" defaultValue="DEFAULT-GROUP"/>
+    <!--应用(服务)名称-->
+    <springProperty name="APP_NAME" scope="context" source="spring.application.name" defaultValue="-"/>
 
     <!-- 是否引入logStash   -->
-    <springProperty name="ENABLE_LOG_STASH" scope="context" source="log-record.persistence.elk.enabled"
+    <springProperty name="ENABLE_LOG_STASH" scope="context" source="log-record.persistence.logstash.enabled"
                     defaultValue="false"/>
-
     <!--LogStash访问host-->
-    <springProperty name="LOG_STASH_HOST" scope="context" source="log-record.persistence.elk.host"
+    <springProperty name="LOG_STASH_HOST" scope="context" source="log-record.persistence.logstash.host"
                     defaultValue="localhost"/>
-    <!--  项目名称  -->
-    <springProperty name="PROJECT_NAME" scope="context" source="log-record.persistence.elk.project-name"
-                    defaultValue="DefaultProject"/>
-    <!--应用(服务)名称-->
-    <springProperty name="APP_NAME" scope="context" source="spring.application.name" defaultValue="SpringBoot"/>
+    <springProperty name="LOG_STASH_OPERATE_LOG_PORT" scope="context"
+                    source="log-record.persistence.logstash.operate-log-port"
+                    defaultValue="4560"/>
+    <springProperty name="LOG_STASH_APP_LOG_PORT" scope="context" source="log-record.persistence.logstash.app-log-port"
+                    defaultValue="4561"/>
+
+
     <!--日志文件前缀-->
     <springProperty name="FILE_INFO_NAME" scope="context" source="log-record.persistence.file.info-log-file-name"
-                    defaultValue="logs/operation-info.%d.%i.log"/>
+                    defaultValue="logs/app-log-info.%d.%i.log"/>
     <springProperty name="FILE_ERROR_NAME" scope="context" source="log-record.persistence.file.error-log-file-name"
-                    defaultValue="logs/operation-error.%d.%i.log"/>
-    <springProperty name="LOG_INNER_ERROR_NAME" scope="context"
-                    source="log-record.persistence.file.log-inner-error-file-name"
-                    defaultValue="logs/log-inner-error.%d.%i.log"/>
-    <!-- 输出到文件   -->
-    <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                    defaultValue="logs/app-log-error.%d.%i.log"/>
+    <springProperty name="OPERATE_LOG_FILE_NAME" scope="context"
+                    source="log-record.persistence.file.operate-log-file-name"
+                    defaultValue="logs/operate-log.%d.%i.log"/>
+
+
+    <!-- info日志文件持久化Appender   -->
+    <appender name="FILE_APP_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--        File和fileNamePattern标签配一个就行-->
         <!--        <File>logs/operation.%-info.%i.log</File>-->
         <append>true</append>
         <!--   接收什么级别的日志     -->
-<!--        <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
-<!--            <level>INFO</level>-->
-<!--            <onMatch>ACCEPT</onMatch>-->
-<!--            <onMismatch>DENY</onMismatch>-->
-<!--        </filter>-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <!--   日志格式     -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--   文件名格式      -->
@@ -48,19 +57,20 @@
                  %level：输出日志级别。
                  %logger{length}：输出logger的名称，length是可选的logger名称长度，缺省为logger名称的完整长度。
                  %msg：输出日志信息。%n：输出平台特定的行分隔符。
-                 %thread：输出产生日志的线程名称。
+                 %t：输出产生日志的线程名称。
                  %X{key}：输出指定key的MDC值。
-                 %class：输出产生日志的Java类的名称。
-                 %file：输出产生日志的Java源文件的名称。
-                 %method：输出产生日志的Java方法的名称。
+                 -%wEx: 输出异常堆栈信息
                  %n:换行-->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level traceId:%X{traceId} - %msg %n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level traceId:%X{traceId} --- [%t] %-40.40logger{39} : - %msg %n
+                -%wEx
+            </pattern>
 
             <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- error日志文件持久化Appender   -->
+    <appender name="FILE_APP_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <append>true</append>
         <!--   接收什么级别的日志     -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -87,12 +97,15 @@
                  %class：输出产生日志的Java类的名称。
                  %file：输出产生日志的Java源文件的名称。
                  %method：输出产生日志的Java方法的名称。-->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level traceId:%X{traceId} - %msg 错误信息: %X{errorMsg} %n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level traceId:%X{traceId} --- [%t] %-40.40logger{39} : - %msg %n
+                -%wEx
+            </pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-    <!--  日志记录出错时,持久化到文件  -->
-    <appender name="FILE_LOG_INNER_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+    <!-- 操作日志文件持久化Appender   -->
+    <appender name="FILE_OPERATE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <append>true</append>
         <!--   接收什么级别的日志     -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -103,7 +116,7 @@
         <!--   日志格式     -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--   文件名格式      -->
-            <fileNamePattern>${LOG_INNER_ERROR_NAME}</fileNamePattern>
+            <fileNamePattern>${OPERATE_LOG_FILE_NAME}</fileNamePattern>
             <maxHistory>90</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
@@ -128,12 +141,12 @@
     <!--  LOG_STASH  -->
     <if condition='property("ENABLE_LOG_STASH").equals("true")'>
         <then>
-            <!--输出到LogStash,DEBUG级别以上-->
-            <appender name="LOG_STASH_INFO" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+            <!--LogStash 操作日志-->
+            <appender name="LOG_STASH_OPERATE_LOG" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>INFO</level>
                 </filter>
-                <destination>${LOG_STASH_HOST}:4560</destination>
+                <destination>${LOG_STASH_HOST}:${LOG_STASH_OPERATE_LOG_PORT}</destination>
                 <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                     <providers>
                         <timestamp>
@@ -143,27 +156,30 @@
                         <pattern>
                             <pattern>
                                 {
-                                "level": "%level",
-                                "项目": "${PROJECT_NAME:-}",
-                                "服务": "${APP_NAME:-}",
-                                "pid": "${PID:-}",
-                                "stack_trace": "%X{userId}",
-                                "message": "%message"
+                                "group": "${GROUP_NAME:-}",
+                                "app_name": "${APP_NAME:-}",
+                                "操作名称":"%X{operate}",
+                                "描述":"%X{content}",
+                                "操作人ID":"%X{operateId}",
+                                "操作人姓名":"%X{operateName}",
+                                "操作时间":"%X{operateTime}",
+                                "是否成功":"%X{success}",
+                                "参数":"%X{parameters}",
+                                "返回值":"%X{returnValue}",
+                                "耗时(毫秒)":"%X{timeCost}",
+                                "错误信息":"%X{exception}"
                                 }
                             </pattern>
                         </pattern>
                     </providers>
                 </encoder>
             </appender>
-
-            <!--输出到LogStash,仅ERROR级别-->
-            <appender name="LOG_STASH_ERROR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-                <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                    <level>ERROR</level>
-                    <onMatch>ACCEPT</onMatch>
-                    <onMismatch>DENY</onMismatch>
+            <!--LogStash 应用日志-->
+            <appender name="LOG_STASH_APP_LOG" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>INFO</level>
                 </filter>
-                <destination>${LOG_STASH_HOST}:4561</destination>
+                <destination>${LOG_STASH_HOST}:${LOG_STASH_APP_LOG_PORT}</destination>
                 <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                     <providers>
                         <timestamp>
@@ -173,12 +189,14 @@
                         <pattern>
                             <pattern>
                                 {
+                                "group": "${GROUP_NAME:-}",
+                                "app_name": "${APP_NAME:-}",
                                 "level": "%level",
-                                "project": "${PROJECT_NAME:-}",
-                                "service": "${APP_NAME:-}",
-                                "pid": "${PID:-}",
-                                "stack_trace": "%X{userId}",
-                                "message": "%message"
+                                "trace_id": "%X{traceId}",
+                                "thread":"%t",
+                                "logger":"%logger",
+                                "message": "%message",
+                                "error":"%wEx"
                                 }
                             </pattern>
                         </pattern>
@@ -193,22 +211,26 @@
     <!--  logger:配置某个包/某个类的日志输出方式,和root相比相当于是定制化了.
            注意需要配置additivity="false",表示不向上级logger传递消息,如果配置为true,可能会导致重复输出
       -->
-    <logger name="LogInnerError" additivity="false" level="INFO">
-        <appender-ref ref="FILE_LOG_INNER_ERROR"/>
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-
     <logger name="FileOperationLog" additivity="false" level="INFO">
-        <appender-ref ref="FILE_INFO"/>
-        <appender-ref ref="FILE_ERROR"/>
+        <appender-ref ref="FILE_OPERATE"/>
     </logger>
 
     <if condition='property("ENABLE_LOG_STASH").equals("true")'>
         <then>
             <logger name="ElkOperationLog" additivity="false" level="INFO">
-                <appender-ref ref="LOG_STASH_INFO"/>
-                <appender-ref ref="LOG_STASH_ERROR"/>
+                <appender-ref ref="LOG_STASH_OPERATE_LOG"/>
             </logger>
         </then>
     </if>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE_APP_INFO"/>
+        <appender-ref ref="FILE_APP_ERROR"/>
+        <if condition='property("ENABLE_LOG_STASH").equals("true")'>
+            <then>
+                <appender-ref ref="LOG_STASH_APP_LOG"/>
+            </then>
+        </if>
+    </root>
 </configuration>

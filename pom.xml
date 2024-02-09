@@ -9,9 +9,9 @@
         <version>2.7.9</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>icu.ynu</groupId>
+    <groupId>com.example.xiao</groupId>
     <artifactId>log-record</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>log-record-core</module>

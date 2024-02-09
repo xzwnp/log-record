@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  icu.ynu.log.autoconfigure.LogRecordAutoConfiguration
+  com.example.xiao.log.autoconfigure.LogRecordAutoConfiguration

@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>icu.ynu</groupId>
+        <groupId>com.example.xiao</groupId>
         <artifactId>log-record</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>log-record-spring-boot-starter</artifactId>
@@ -19,9 +19,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>icu.ynu</groupId>
+            <groupId>com.example.xiao</groupId>
             <artifactId>log-record-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
