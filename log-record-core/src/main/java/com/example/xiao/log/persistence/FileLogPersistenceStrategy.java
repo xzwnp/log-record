@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * icu.ynu.log.persistence
+ * com.example.xiao.log.persistence
  * 基于日志文件的持久化策略
  *
  * @author xzwnp

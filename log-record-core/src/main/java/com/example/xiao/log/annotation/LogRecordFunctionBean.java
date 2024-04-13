@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.lang.annotation.*;
 
 /**
- * icu.ynu.log.annotation
+ * com.example.xiao.log.annotation
  *
  * @author xiaozhiwei
  * 2023/3/11

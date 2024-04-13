@@ -1,7 +1,7 @@
 package com.example.xiao.log.common;
 
 /**
- * icu.ynu.log.common
+ * com.example.xiao.log.common
  *
  * @author xiaozhiwei
  * 2023/3/10

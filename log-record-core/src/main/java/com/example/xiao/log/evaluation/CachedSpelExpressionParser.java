@@ -10,7 +10,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
  * SpEl表达式的解析器,在原有解析器的基础上,增加了对SpEL表达式进行缓存
- * icu.ynu.log.evaluation
+ * com.example.xiao.log.evaluation
  *
  * @author xzwnp
  * 2023/3/1

@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * icu.ynu.log.bean
+ * com.example.xiao.log.bean
  *
  * @author xzwnp
  * 2023/3/1

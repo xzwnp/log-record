@@ -9,8 +9,11 @@
     <!--应用(服务)名称-->
     <springProperty name="APP_NAME" scope="context" source="spring.application.name" defaultValue="-"/>
 
+    <!-- 日志是否写入文件   -->
+    <springProperty name="ENABLE_FILE_LOG" scope="context" source="log-record.persistence.file.enable"
+                    defaultValue="true"/>
     <!-- 是否引入logStash   -->
-    <springProperty name="ENABLE_LOG_STASH" scope="context" source="log-record.persistence.logstash.enabled"
+    <springProperty name="ENABLE_LOG_STASH" scope="context" source="log-record.persistence.logstash.enable"
                     defaultValue="false"/>
     <!--LogStash访问host-->
     <springProperty name="LOG_STASH_HOST" scope="context" source="log-record.persistence.logstash.host"
@@ -23,13 +26,15 @@
 
 
     <!--日志文件前缀-->
-    <springProperty name="FILE_INFO_NAME" scope="context" source="log-record.persistence.file.info-log-file-name"
-                    defaultValue="logs/app-log-info.%d.%i.log"/>
-    <springProperty name="FILE_ERROR_NAME" scope="context" source="log-record.persistence.file.error-log-file-name"
-                    defaultValue="logs/app-log-error.%d.%i.log"/>
-    <springProperty name="OPERATE_LOG_FILE_NAME" scope="context"
-                    source="log-record.persistence.file.operate-log-file-name"
-                    defaultValue="logs/operate-log.%d.%i.log"/>
+    <springProperty name="FILE_LOG_DIR" scope="context" source="log-record.persistence.file.dir"
+                    defaultValue="logs"/>
+    <!--    <springProperty name="FILE_INFO_NAME" scope="context" source="log-record.persistence.file.info-log-file-name"-->
+    <!--                    defaultValue="logs/app-log-info.%d.%i.log"/>-->
+    <!--    <springProperty name="FILE_ERROR_NAME" scope="context" source="log-record.persistence.file.error-log-file-name"-->
+    <!--                    defaultValue="logs/app-log-error.%d.%i.log"/>-->
+    <!--    <springProperty name="OPERATE_LOG_FILE_NAME" scope="context"-->
+    <!--                    source="log-record.persistence.file.operate-log-file-name"-->
+    <!--                    defaultValue="logs/operate-log.%d.%i.log"/>-->
 
 
     <!-- info日志文件持久化Appender   -->
@@ -46,7 +51,8 @@
         <!--   日志格式     -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--   文件名格式      -->
-            <fileNamePattern>${FILE_INFO_NAME}</fileNamePattern>
+            <fileNamePattern>${FILE_LOG_DIR}/app-log-info_${APP_NAME}_${GROUP_NAME}_%d{yyyy-MM-dd}_%i.log
+            </fileNamePattern>
             <maxHistory>90</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
@@ -81,7 +87,8 @@
         <!--   日志格式     -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--   文件名格式      -->
-            <fileNamePattern>${FILE_ERROR_NAME}</fileNamePattern>
+            <fileNamePattern>${FILE_LOG_DIR}/app-log-error_${APP_NAME}_${GROUP_NAME}_%d{yyyy-MM-dd}_%i.log
+            </fileNamePattern>
             <maxHistory>90</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
@@ -116,7 +123,8 @@
         <!--   日志格式     -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--   文件名格式      -->
-            <fileNamePattern>${OPERATE_LOG_FILE_NAME}</fileNamePattern>
+            <fileNamePattern>${FILE_LOG_DIR}/operate-log_${APP_NAME}_${GROUP_NAME}_%d{yyyy-MM-dd}_%i.log
+            </fileNamePattern>
             <maxHistory>90</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
@@ -158,16 +166,17 @@
                                 {
                                 "group": "${GROUP_NAME:-}",
                                 "app_name": "${APP_NAME:-}",
-                                "操作名称":"%X{operate}",
-                                "描述":"%X{content}",
-                                "操作人ID":"%X{operateId}",
-                                "操作人姓名":"%X{operateName}",
-                                "操作时间":"%X{operateTime}",
-                                "是否成功":"%X{success}",
-                                "参数":"%X{parameters}",
-                                "返回值":"%X{returnValue}",
-                                "耗时(毫秒)":"%X{timeCost}",
-                                "错误信息":"%X{exception}"
+                                "operate":"%X{operate}",
+                                "content":"%X{content}",
+                                "operator_id":"%X{operatorId}",
+                                "operator_name":"%X{operatorName}",
+                                "operate_time":"%X{operateTime}",
+                                "trace_id":"%X{traceId}",
+                                "success":"%X{success}",
+                                "parameters":"%X{parameters}",
+                                "return_value":"%X{returnValue}",
+                                "time_cost":"%X{timeCost}",
+                                "exception":"%X{exception}"
                                 }
                             </pattern>
                         </pattern>
@@ -193,10 +202,10 @@
                                 "app_name": "${APP_NAME:-}",
                                 "level": "%level",
                                 "trace_id": "%X{traceId}",
+                                "time":"%d{yyyy-MM-dd HH:mm:ss.SSS}",
                                 "thread":"%t",
                                 "logger":"%logger",
-                                "message": "%message",
-                                "error":"%wEx"
+                                "message": "%message%n%wEx"
                                 }
                             </pattern>
                         </pattern>
@@ -211,9 +220,13 @@
     <!--  logger:配置某个包/某个类的日志输出方式,和root相比相当于是定制化了.
            注意需要配置additivity="false",表示不向上级logger传递消息,如果配置为true,可能会导致重复输出
       -->
-    <logger name="FileOperationLog" additivity="false" level="INFO">
-        <appender-ref ref="FILE_OPERATE"/>
-    </logger>
+    <if condition='property("ENABLE_FILE_LOG").equals("true")'>
+        <then>
+            <logger name="FileOperationLog" additivity="false" level="INFO">
+                <appender-ref ref="FILE_OPERATE"/>
+            </logger>
+        </then>
+    </if>
 
     <if condition='property("ENABLE_LOG_STASH").equals("true")'>
         <then>
@@ -225,12 +238,21 @@
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE_APP_INFO"/>
-        <appender-ref ref="FILE_APP_ERROR"/>
-        <if condition='property("ENABLE_LOG_STASH").equals("true")'>
-            <then>
-                <appender-ref ref="LOG_STASH_APP_LOG"/>
-            </then>
-        </if>
+
     </root>
+    <if condition='property("ENABLE_FILE_LOG").equals("true")'>
+        <then>
+            <root level="INFO">
+                <appender-ref ref="FILE_APP_INFO"/>
+                <appender-ref ref="FILE_APP_ERROR"/>
+            </root>
+        </then>
+    </if>
+    <if condition='property("ENABLE_LOG_STASH").equals("true")'>
+        <then>
+            <root level="INFO">
+                <appender-ref ref="LOG_STASH_APP_LOG"/>
+            </root>
+        </then>
+    </if>
 </configuration>

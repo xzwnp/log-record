@@ -3,7 +3,7 @@ package com.example.xiao.log.persistence;
 import com.example.xiao.log.entity.LogRecordDto;
 
 /**
- * icu.ynu.log.persistence
+ * com.example.xiao.log.persistence
  *
  * @author xzwnp
  * 2023/3/2

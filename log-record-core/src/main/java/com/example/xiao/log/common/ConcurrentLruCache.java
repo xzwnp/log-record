@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * icu.ynu.log.common
+ * com.example.xiao.log.common
  *
  * @author xiaozhiwei
  * 2023/3/11

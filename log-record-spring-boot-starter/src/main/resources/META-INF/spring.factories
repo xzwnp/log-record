@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.example.xiao.log.autoconfigure.LogRecordAutoConfiguration

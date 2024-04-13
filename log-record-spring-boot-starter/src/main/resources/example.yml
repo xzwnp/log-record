@@ -1,8 +1,15 @@
-operation-log:
+log-record:
   enable: true
   pool:
-    name: "我的自定义线程池"
+    name: "log-record-thread-pool"
     core-size: 3
+    max-size: 10
     keep-alive-time: 30
     time-unit: seconds
-    rejectedExecutionHandler: java.util.concurrent.ThreadPoolExecutor.DiscardPolicy
+    rejectedExecutionHandler: java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy
+  persistence:
+    logstash:
+      enable: true
+      host: localhost
+      operate-log-port: 4560
+      app-log-port: 4561

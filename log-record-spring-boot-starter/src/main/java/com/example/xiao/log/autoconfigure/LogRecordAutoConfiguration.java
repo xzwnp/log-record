@@ -16,6 +16,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.ExpressionParser;
@@ -28,6 +29,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 @ComponentScan(basePackages = "com.example.xiao.log")
 @EnableConfigurationProperties(LogRecordProperties.class)
+@EnableAspectJAutoProxy
 public class LogRecordAutoConfiguration {
     @Autowired
     LogRecordProperties logRecordProperties;
@@ -49,13 +51,13 @@ public class LogRecordAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "log-record.persistence.file", name = "enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "log-record.persistence.file", name = "enable", havingValue = "true", matchIfMissing = true)
     LogPersistenceStrategy fileLogPersistenceStrategy() {
         return new FileLogPersistenceStrategy();
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "log-record.persistence.logstash", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "log-record.persistence.logstash", name = "enable", havingValue = "true")
     ElkLogPersistenceStrategy eLkLogPersistenceStrategy() {
         return new ElkLogPersistenceStrategy();
     }
