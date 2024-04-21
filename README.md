@@ -21,13 +21,13 @@ Spring Boot,TransmittableThread Local
 
 ### 导入依赖
 
-暂未上传到git仓库,请clone后安装到本地仓库
+暂未上传到远程仓库,请clone后安装到本地仓库
 
 ```xml
         <dependency>
-            <groupId>icu.ynu</groupId>
+            <groupId>com.example.xiao</groupId>
             <artifactId>log-record-spring-boot-starter</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>2.0.1-SNAPSHOT</version>
         </dependency>
 ```
 
