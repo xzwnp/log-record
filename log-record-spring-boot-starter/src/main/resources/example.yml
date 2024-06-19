@@ -1,5 +1,8 @@
 log-record:
-  enable: true
+  enable: true #可选,默认开启
+  appName: hello-log-manager #应用名称
+  groupName: dev #分组名称
+  #  线程池配置,用于异步生成操作日志,可选
   pool:
     name: "log-record-thread-pool"
     core-size: 3
@@ -8,8 +11,11 @@ log-record:
     time-unit: seconds
     rejectedExecutionHandler: java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy
   persistence:
-    logstash:
+    logstash: #日志采集上报相关配置
       enable: true
-      host: localhost
+      host: localhost #LogStash服务端地址
       operate-log-port: 4560
       app-log-port: 4561
+    file: #日志是否持久化到本地文件系统
+      enable: true
+      dir: logs
